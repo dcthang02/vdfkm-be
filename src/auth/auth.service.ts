@@ -29,6 +29,9 @@ export class AuthService {
     });
     try {
       await user.save();
+      const payload: JwtPayload = { username };
+      const accessToken = this.jwtService.sign(payload);
+      return { accessToken };
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException('Username already exists');
@@ -45,7 +48,7 @@ export class AuthService {
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload: JwtPayload = { username };
-      const accessToken = await this.jwtService.sign(payload);
+      const accessToken = this.jwtService.sign(payload);
       return { accessToken };
     } else {
       throw new UnauthorizedException('Please check your login credentials');
